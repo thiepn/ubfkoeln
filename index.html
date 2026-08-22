@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
+<meta name="ubf-demo-base" content="/ubfkoeln">
 <meta name="description" content="UBF Köln Website V2 — Stakeholder-Demo, Inhaltsstand 22.08.2026.">
 <title>UBF Köln Website V2 — Stakeholder Demo</title>
 <style>
@@ -1319,10 +1320,39 @@ const LEGACY_REDIRECTS = {
  "/wp/ressourcen-bibelstudium":"/ressourcen-bibelstudium",
  "/wp/test-2":"/events/2025-12-06-geschenke-verpacken-tafel-koeln"
 };
+const APP_BASE = "/ubfkoeln";
+const USE_HASH_ROUTING = location.protocol === "file:";
 const scrollPositions = new Map();
 let navigationIntent = "initial";
 let lastRouteKey = null;
-function routeKeyFromUrl(url){ try{const u=new URL(url);return u.hash||"#/"}catch{return "#/"} }
+function normalizeRoutePath(path){
+ path=String(path||"/");
+ if(!path.startsWith("/"))path="/"+path;
+ path=path.replace(/\/{2,}/g,"/").replace(/\/+$/g,"")||"/";
+ try{path=decodeURI(path)}catch{}
+ return path;
+}
+function deployedHref(route){
+ const raw=String(route||"/");
+ const qIndex=raw.indexOf("?");
+ const rawPath=qIndex>=0?raw.slice(0,qIndex):raw;
+ const query=qIndex>=0?raw.slice(qIndex+1):"";
+ const path=normalizeRoutePath(rawPath);
+ const pathname=path==="/" ? APP_BASE+"/" : APP_BASE+path+"/";
+ return pathname+(query?"?"+query:"");
+}
+function routeKeyFromUrl(url){
+ try{
+  const u=new URL(url,location.href);
+  if(USE_HASH_ROUTING && u.hash.startsWith("#/")) return u.hash;
+  let path=u.pathname;
+  if(path===APP_BASE || path===APP_BASE+"/")path="/";
+  else if(path.startsWith(APP_BASE+"/"))path=path.slice(APP_BASE.length);
+  path=normalizeRoutePath(path);
+  return path+(u.search||"");
+ }catch{return USE_HASH_ROUTING?"#/":"/"}
+}
+function currentRouteKey(){return USE_HASH_ROUTING?(location.hash||"#/"):(currentPathInfo().path+(location.search||""));}
 function resolveLegacyRoute(path,query){
  const clean=path.replace(/\/+$/,"")||"/";
  if(clean==="/wp/predigten"){
@@ -1337,9 +1367,12 @@ function resolveLegacyRoute(path,query){
 function syncHashQuery(params,{replace=true}={}){
  const info=currentPathInfo();
  const q=params instanceof URLSearchParams?params:new URLSearchParams(params||{});
- const next="#"+info.path+(q.toString()?"?"+q.toString():"");
- if(location.hash===next)return;
+ const route=info.path+(q.toString()?"?"+q.toString():"");
+ const next=pathHref(route);
+ const current=USE_HASH_ROUTING?(location.hash||"#/"):(location.pathname+location.search);
+ if(current===next)return;
  if(replace) history.replaceState(history.state,"",next); else history.pushState(history.state,"",next);
+ if(!USE_HASH_ROUTING) render({preserveScroll:true,focusMain:false});
 }
 function applyLegacyRedirect(){
  const info=currentPathInfo(); const target=resolveLegacyRoute(info.path,info.query);
@@ -1403,7 +1436,10 @@ function heroFactIcon(text=""){const t=text.toLowerCase();if(/berrenrather|forum
 function factIcon(label=""){const t=label.toLowerCase();if(/e-mail|email/.test(t))return "mail";if(/telefon|phone/.test(t))return "phone";if(/adresse|address|ort|location/.test(t))return "map-pin";if(/bibel|passage/.test(t))return "book-open";if(/prediger|preacher/.test(t))return "users";if(/datum|date|zeit|time/.test(t))return "calendar";if(/sprache|language/.test(t))return "globe";return "arrow-right";}
 function brandMark(which){if(which==="alpha")return `<div class="hero-brand hero-brand--alpha"><img src="${BRAND.ALPHA}" alt="Alpha"></div>`;if(which==="ubf")return `<div class="hero-brand hero-brand--ubf"><img src="${BRAND.UBF}" alt="UBF · University Bible Fellowship"></div>`;return "";}
 
-const pathHref = p => "#"+(p.startsWith("/")?p:"/"+p);
+const pathHref = p => {
+ const route=p.startsWith("/")?p:"/"+p;
+ return USE_HASH_ROUTING ? "#"+route : deployedHref(route);
+};
 const prodUrl = p => "https://koelnubf.org"+(p==="/" ? "/" : p.replace(/\/?$/,"/"));
 const localeOf = path => path==="/en" || path.startsWith("/en/") ? "en" : "de";
 const fmtDate = (iso,loc="de") => {
@@ -1467,14 +1503,20 @@ function faqs(items){
  return `<div>${items.map(([q,a])=>`<details class="faq"><summary>${esc(q)}</summary><div class="prose">${a}</div></details>`).join("")}</div>`;
 }
 function currentPathInfo(){
- let raw=(location.hash||"#/").slice(1);
- if(!raw.startsWith("/")) raw="/"+raw;
+ let raw;
+ if(USE_HASH_ROUTING || location.hash.startsWith("#/")){
+  raw=(location.hash||"#/").slice(1);
+ }else{
+  let pathname=location.pathname;
+  if(pathname===APP_BASE || pathname===APP_BASE+"/") pathname="/";
+  else if(pathname.startsWith(APP_BASE+"/")) pathname=pathname.slice(APP_BASE.length);
+  raw=pathname+(location.search||"");
+ }
+ if(!raw.startsWith("/"))raw="/"+raw;
  const qIndex=raw.indexOf("?");
  const rawPath=qIndex>=0?raw.slice(0,qIndex):raw;
  const query=qIndex>=0?raw.slice(qIndex+1):"";
- let path=rawPath.replace(/\/{2,}/g,"/").replace(/\/+$/,"")||"/";
- try{path=decodeURI(path)}catch{}
- return {path,query:new URLSearchParams(query)};
+ return {path:normalizeRoutePath(rawPath),query:new URLSearchParams(query)};
 }
 function currentLocale(){return localeOf(currentPathInfo().path)}
 
@@ -2194,11 +2236,11 @@ function render(opts={}){
  document.getElementById("site-header").innerHTML=headerHTML(path);document.getElementById("main").innerHTML=(QA_SCENARIO?qaTestBadge():"")+routePage(path);document.getElementById("site-footer").innerHTML=footerHTML(path);installPageHandlers();
  const main=document.getElementById("main");
  requestAnimationFrame(()=>{
-  if(opts.restoreScroll){const y=scrollPositions.get(location.hash)||0;window.scrollTo(0,y);}else if(!opts.preserveScroll){window.scrollTo(0,0);}
+  if(opts.restoreScroll){const y=scrollPositions.get(currentRouteKey())||0;window.scrollTo(0,y);}else if(!opts.preserveScroll){window.scrollTo(0,0);}
   if(opts.focusMain!==false && !opts.restoreScroll)main.focus({preventScroll:true});
  });
  if(QA)updateQA(path);
- lastRouteKey=location.hash;
+ lastRouteKey=currentRouteKey();
 }
 function updateQA(path){
  const qa=document.getElementById("qa-bar"),v=qaValidate();
@@ -2206,21 +2248,65 @@ function updateQA(path){
 }
 document.addEventListener("click",e=>{
  if(e.target.closest?.("#skip-link")){e.preventDefault();const main=document.getElementById("main");main?.scrollIntoView({block:"start"});main?.focus({preventScroll:true});return;}
- const a=e.target.closest?.('a[href^="#/"]');if(a){scrollPositions.set(location.hash,window.scrollY);navigationIntent="link";}
+ const a=e.target.closest?.("a[href]");
+ if(a){
+  const href=a.getAttribute("href")||"";
+  const isLocalHash=USE_HASH_ROUTING && href.startsWith("#/");
+  const isCleanInternal=!USE_HASH_ROUTING && href.startsWith(APP_BASE+"/");
+  if(isLocalHash || isCleanInternal){
+   scrollPositions.set(currentRouteKey(),window.scrollY);navigationIntent="link";
+   if(isCleanInternal && !e.defaultPrevented && e.button===0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && !a.target){
+    e.preventDefault();
+    history.pushState({ubfv2:true},"",href);
+    render({restoreScroll:false,focusMain:true});
+    navigationIntent="history";
+   }
+  }
+ }
  if(!e.target.closest?.(".nav-group"))closeDesktopMenus();
 });
 window.addEventListener("hashchange",e=>{
+ if(!USE_HASH_ROUTING)return;
  const oldKey=routeKeyFromUrl(e.oldURL);scrollPositions.set(oldKey,window.scrollY);
  const restore=navigationIntent!=="link";navigationIntent="history";render({restoreScroll:restore,focusMain:!restore});
 });
+window.addEventListener("popstate",()=>{
+ if(USE_HASH_ROUTING)return;
+ if(lastRouteKey)scrollPositions.set(lastRouteKey,window.scrollY);
+ navigationIntent="history";
+ render({restoreScroll:true,focusMain:false});
+});
 window.addEventListener("keydown",e=>{if(e.key==="Escape")closeDesktopMenus({restore:true});});
+function restoreCleanRoute(){
+ if(USE_HASH_ROUTING)return;
+ // Keep old #/ links working, but immediately replace them with the clean URL.
+ if(location.hash.startsWith("#/")){
+  const raw=location.hash.slice(1);
+  history.replaceState({migratedFromHash:true},"",deployedHref(raw));
+  return;
+ }
+ // GitHub Pages direct deep links pass through 404.html once, then restore here.
+ let saved=null;
+ try{saved=sessionStorage.getItem("ubfkoeln:clean-route");if(saved)sessionStorage.removeItem("ubfkoeln:clean-route");}catch{}
+ const fallback=new URLSearchParams(location.search).get("__route");
+ if(saved || fallback){
+  const raw=saved || fallback;
+  let route=raw;
+  if(route.startsWith(APP_BASE))route=route.slice(APP_BASE.length)||"/";
+  if(!route.startsWith("/"))route="/"+route;
+  history.replaceState({restoredDeepLink:true},"",deployedHref(route));
+ }
+}
 function boot(){
- if(!location.hash)history.replaceState(null,"","#/");history.scrollRestoration="manual";
+ history.scrollRestoration="manual";
+ if(USE_HASH_ROUTING){if(!location.hash)history.replaceState(null,"","#/");}
+ else restoreCleanRoute();
  if(applyLegacyRedirect())return render({focusMain:false,_redirected:true});
  render({focusMain:false});
  if(!readConsent())showConsent(null);
  location._ubfv2Initial=true;
 }
+
 return {boot,DATA,render,qaValidate,serviceSnapshot,eventStatus,nextEvents,readConsent,routePage,resolveLegacyRoute,currentPathInfo,filterSermons};
 })();
 UBFv2.boot();
