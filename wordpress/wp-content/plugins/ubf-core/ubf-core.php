@@ -33,19 +33,19 @@ function ubf_core_register_post_types() {
 				'all_items'          => __( 'Alle Predigten', 'ubf-core' ),
 				'menu_name'          => __( 'Predigten', 'ubf-core' ),
 			),
-			'public'             => true,
-			'show_in_rest'       => true,
-			'has_archive'        => 'predigten',
-			'rewrite'            => array(
+			'public'              => true,
+			'show_in_rest'        => true,
+			'has_archive'         => 'predigten',
+			'rewrite'             => array(
 				'slug'       => 'predigten',
 				'with_front' => false,
 			),
-			'menu_icon'          => 'dashicons-microphone',
-			'menu_position'      => 20,
-			'supports'           => array( 'title', 'editor', 'excerpt', 'thumbnail', 'revisions' ),
-			'show_in_nav_menus'  => true,
-			'publicly_queryable' => true,
-			'exclude_from_search'=> false,
+			'menu_icon'           => 'dashicons-microphone',
+			'menu_position'       => 20,
+			'supports'            => array( 'title', 'editor', 'excerpt', 'thumbnail', 'revisions', 'custom-fields' ),
+			'show_in_nav_menus'   => true,
+			'publicly_queryable'  => true,
+			'exclude_from_search' => false,
 		)
 	);
 
@@ -65,19 +65,19 @@ function ubf_core_register_post_types() {
 				'all_items'          => __( 'Alle Veranstaltungen', 'ubf-core' ),
 				'menu_name'          => __( 'Veranstaltungen', 'ubf-core' ),
 			),
-			'public'             => true,
-			'show_in_rest'       => true,
-			'has_archive'        => 'veranstaltungen',
-			'rewrite'            => array(
+			'public'              => true,
+			'show_in_rest'        => true,
+			'has_archive'         => 'veranstaltungen',
+			'rewrite'             => array(
 				'slug'       => 'veranstaltungen',
 				'with_front' => false,
 			),
-			'menu_icon'          => 'dashicons-calendar-alt',
-			'menu_position'      => 21,
-			'supports'           => array( 'title', 'editor', 'excerpt', 'thumbnail', 'revisions' ),
-			'show_in_nav_menus'  => true,
-			'publicly_queryable' => true,
-			'exclude_from_search'=> false,
+			'menu_icon'           => 'dashicons-calendar-alt',
+			'menu_position'       => 21,
+			'supports'            => array( 'title', 'editor', 'excerpt', 'thumbnail', 'revisions', 'custom-fields' ),
+			'show_in_nav_menus'   => true,
+			'publicly_queryable'  => true,
+			'exclude_from_search' => false,
 		)
 	);
 }
@@ -121,9 +121,12 @@ add_action( 'init', 'ubf_core_register_taxonomies' );
  * @param bool   $allowed  Existing authorization result.
  * @param string $meta_key Meta key.
  * @param int    $post_id  Post ID.
+ * @param int    $user_id  User ID.
+ * @param string $cap      Requested capability.
+ * @param array  $caps     Primitive capabilities.
  * @return bool
  */
-function ubf_core_can_edit_meta( $allowed, $meta_key, $post_id ) {
+function ubf_core_can_edit_meta( $allowed, $meta_key, $post_id, $user_id, $cap, $caps ) {
 	return current_user_can( 'edit_post', $post_id );
 }
 
@@ -134,9 +137,10 @@ function ubf_core_can_edit_meta( $allowed, $meta_key, $post_id ) {
  */
 function ubf_core_register_meta() {
 	$common = array(
-		'single'        => true,
-		'show_in_rest'  => true,
-		'auth_callback' => 'ubf_core_can_edit_meta',
+		'single'            => true,
+		'show_in_rest'      => true,
+		'revisions_enabled' => true,
+		'auth_callback'     => 'ubf_core_can_edit_meta',
 	);
 
 	register_post_meta(
