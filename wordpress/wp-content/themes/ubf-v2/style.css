@@ -75,7 +75,7 @@ img {
 }
 
 .ubf-primary-header {
-  background: color-mix(in srgb, var(--ubf-white) 96%, transparent);
+  background: var(--ubf-white);
   border-bottom: 1px solid var(--ubf-neutral);
   min-height: var(--ubf-header-height);
   position: sticky;
@@ -113,6 +113,10 @@ img {
 
 .ubf-header-cta .wp-element-button {
   white-space: nowrap;
+}
+
+.ubf-mobile-only {
+  display: none;
 }
 
 /* Editorial geometry */
@@ -224,6 +228,18 @@ img {
 
   .ubf-primary-nav .wp-block-navigation__responsive-container-content {
     align-items: flex-start;
+  }
+
+  .ubf-primary-nav .ubf-mobile-only {
+    display: flex;
+    margin-top: 0.5rem;
+  }
+
+  .ubf-primary-nav .ubf-mobile-only .wp-block-navigation-item__content {
+    background: var(--ubf-navy);
+    color: var(--ubf-white);
+    padding: 0.8rem 1rem;
+    text-decoration: none;
   }
 
   .ubf-header-cta {
