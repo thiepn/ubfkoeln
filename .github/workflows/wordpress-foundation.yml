@@ -1,0 +1,81 @@
+name: WordPress foundation checks
+
+on:
+  pull_request:
+    paths:
+      - "wordpress/**"
+      - ".github/workflows/wordpress-foundation.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "wordpress/**"
+      - ".github/workflows/wordpress-foundation.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  php-lint:
+    name: PHP ${{ matrix.php-version }} lint
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - "7.4"
+          - "8.2"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: none
+
+      - name: Lint PHP files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -d '' files < <(find wordpress -type f -name '*.php' -print0)
+          if (( ${#files[@]} == 0 )); then
+            echo "No PHP files found."
+            exit 1
+          fi
+          for file in "${files[@]}"; do
+            php -l "$file"
+          done
+
+  theme-contract:
+    name: Block theme contract
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate theme.json syntax
+        run: python3 -m json.tool wordpress/wp-content/themes/ubf-v2/theme.json > /dev/null
+
+      - name: Assert required foundation files
+        shell: bash
+        run: |
+          set -euo pipefail
+          theme="wordpress/wp-content/themes/ubf-v2"
+          plugin="wordpress/wp-content/plugins/ubf-core"
+          test -f "$theme/style.css"
+          test -f "$theme/theme.json"
+          test -f "$theme/templates/index.html"
+          test -f "$theme/parts/header.html"
+          test -f "$theme/parts/footer.html"
+          test -f "$plugin/ubf-core.php"
+
+      - name: Guard production boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! grep -RniE 'fonts\.googleapis\.com|fonts\.gstatic\.com' wordpress/wp-content/themes/ubf-v2
+          ! grep -RniE '<script[^>]+src=["'"']https?://' wordpress/wp-content/themes/ubf-v2 wordpress/wp-content/plugins/ubf-core
