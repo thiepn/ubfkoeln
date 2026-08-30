@@ -43,6 +43,7 @@ function ubf_core_register_post_types() {
 			'menu_icon'           => 'dashicons-microphone',
 			'menu_position'       => 20,
 			'supports'            => array( 'title', 'editor', 'excerpt', 'thumbnail', 'revisions', 'custom-fields' ),
+			'taxonomies'          => array( 'ubf_sermon_series' ),
 			'show_in_nav_menus'   => true,
 			'publicly_queryable'  => true,
 			'exclude_from_search' => false,
@@ -247,9 +248,18 @@ function ubf_core_activate() {
 register_activation_hook( __FILE__, 'ubf_core_activate' );
 
 /**
- * Restore rewrite rules on deactivation. Content is intentionally retained.
+ * Remove the registered routes before flushing. Content itself is retained.
  */
 function ubf_core_deactivate() {
+	if ( post_type_exists( 'ubf_sermon' ) ) {
+		unregister_post_type( 'ubf_sermon' );
+	}
+	if ( post_type_exists( 'ubf_event' ) ) {
+		unregister_post_type( 'ubf_event' );
+	}
+	if ( taxonomy_exists( 'ubf_sermon_series' ) ) {
+		unregister_taxonomy( 'ubf_sermon_series' );
+	}
 	flush_rewrite_rules();
 }
 register_deactivation_hook( __FILE__, 'ubf_core_deactivate' );
