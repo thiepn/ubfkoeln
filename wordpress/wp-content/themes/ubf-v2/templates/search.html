@@ -1,0 +1,39 @@
+<!-- wp:template-part {"slug":"header","tagName":"header"} /-->
+
+<!-- wp:group {"tagName":"main","anchor":"main-content","align":"wide","className":"ubf-section","layout":{"type":"constrained"}} -->
+<main id="main-content" class="wp-block-group alignwide ubf-section">
+	<!-- wp:query-title {"type":"search","showPrefix":true,"fontSize":"3-xl"} /-->
+
+	<!-- wp:search {"label":"Website durchsuchen","showLabel":false,"placeholder":"Suchbegriff","buttonText":"Suchen","buttonUseIcon":false,"align":"wide"} /-->
+
+	<!-- wp:query {"query":{"perPage":10,"pages":0,"offset":0,"postType":"any","order":"desc","orderBy":"relevance","author":"","search":"","exclude":[],"sticky":"","inherit":true},"align":"wide"} -->
+	<div class="wp-block-query alignwide">
+		<!-- wp:post-template -->
+			<!-- wp:post-title {"isLink":true,"fontSize":"xl"} /-->
+			<!-- wp:post-excerpt {"moreText":"Öffnen"} /-->
+		<!-- /wp:post-template -->
+
+		<!-- wp:query-no-results -->
+			<!-- wp:group {"className":"ubf-reading-width","layout":{"type":"constrained"}} -->
+			<div class="wp-block-group ubf-reading-width">
+				<!-- wp:heading {"level":2,"fontSize":"xl"} -->
+				<h2 class="wp-block-heading has-xl-font-size">Keine passenden Ergebnisse.</h2>
+				<!-- /wp:heading -->
+				<!-- wp:paragraph -->
+				<p>Versuche einen kürzeren oder allgemeineren Suchbegriff.</p>
+				<!-- /wp:paragraph -->
+			</div>
+			<!-- /wp:group -->
+		<!-- /wp:query-no-results -->
+
+		<!-- wp:query-pagination {"layout":{"type":"flex","justifyContent":"space-between"}} -->
+			<!-- wp:query-pagination-previous {"label":"Zurück"} /-->
+			<!-- wp:query-pagination-numbers /-->
+			<!-- wp:query-pagination-next {"label":"Weiter"} /-->
+		<!-- /wp:query-pagination -->
+	</div>
+	<!-- /wp:query -->
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->

@@ -1,0 +1,279 @@
+/*
+Theme Name: UBF Köln V2
+Theme URI: https://koelnubf.org/
+Author: UBF Köln
+Description: Production block theme foundation for the UBF Köln Website V2 redesign.
+Version: 0.1.0
+Requires at least: 6.6
+Requires PHP: 7.4
+Text Domain: ubf-v2
+*/
+
+:root {
+  --ubf-navy: #0B3654;
+  --ubf-blue: #2E6F94;
+  --ubf-ink: #10232D;
+  --ubf-paper: #F7F4EE;
+  --ubf-white: #FFFFFF;
+  --ubf-neutral: #E8EDF0;
+  --ubf-stone: #D7C5AC;
+  --ubf-content: 720px;
+  --ubf-wide: 1280px;
+  --ubf-header-height: 80px;
+  --ubf-header-sticky-height: 68px;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--ubf-header-sticky-height) + 24px);
+}
+
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  height: auto;
+  max-width: 100%;
+}
+
+/* Accessibility */
+:where(a, button, input, select, textarea, .wp-element-button):focus-visible {
+  outline: 3px solid var(--ubf-blue);
+  outline-offset: 3px;
+}
+
+.skip-link {
+  background: var(--ubf-white);
+  color: var(--ubf-navy);
+  left: 16px;
+  padding: 12px 16px;
+  position: fixed;
+  top: -100px;
+  z-index: 100000;
+}
+
+.skip-link:focus {
+  top: 16px;
+}
+
+/* Shell */
+.ubf-utility {
+  align-items: center;
+  background: var(--ubf-navy);
+  color: var(--ubf-white);
+  display: flex;
+  min-height: 34px;
+}
+
+.ubf-utility a,
+.ubf-utility .wp-block-site-tagline {
+  color: inherit;
+  font-size: 0.8125rem;
+  line-height: 1.25;
+}
+
+.ubf-primary-header {
+  background: var(--ubf-white);
+  border-bottom: 1px solid var(--ubf-neutral);
+  min-height: var(--ubf-header-height);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.admin-bar .ubf-primary-header {
+  top: 32px;
+}
+
+.ubf-primary-header > .wp-block-group {
+  min-height: var(--ubf-header-height);
+}
+
+.ubf-brand a {
+  color: var(--ubf-navy);
+  text-decoration: none;
+}
+
+.ubf-primary-nav .wp-block-navigation-item__content {
+  color: var(--ubf-ink);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+  text-underline-offset: 0.3em;
+}
+
+.ubf-primary-nav .wp-block-navigation-item__content:hover,
+.ubf-primary-nav .wp-block-navigation-item__content[aria-current="page"] {
+  color: var(--ubf-blue);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+.ubf-header-cta .wp-element-button {
+  white-space: nowrap;
+}
+
+.ubf-mobile-only {
+  display: none;
+}
+
+/* Editorial geometry */
+.wp-element-button,
+.wp-block-button__link {
+  border-radius: 3px;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 0.8rem 1.15rem;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.wp-block-button.is-style-outline .wp-element-button {
+  border-width: 1px;
+}
+
+.wp-block-image img,
+.wp-block-cover,
+.wp-block-post-featured-image img {
+  border-radius: 0;
+}
+
+.ubf-reading-width {
+  max-width: var(--ubf-content);
+}
+
+.ubf-section {
+  padding-block: clamp(4rem, 7vw, 8rem);
+}
+
+.ubf-section--compact {
+  padding-block: clamp(2.5rem, 5vw, 5rem);
+}
+
+.ubf-eyebrow {
+  color: var(--ubf-blue);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.ubf-rule {
+  border-top: 1px solid var(--ubf-neutral);
+}
+
+/* Footer */
+.ubf-site-footer {
+  background: var(--ubf-navy);
+  color: var(--ubf-white);
+}
+
+.ubf-site-footer a,
+.ubf-site-footer .wp-block-site-title a,
+.ubf-site-footer .wp-block-site-tagline {
+  color: inherit;
+}
+
+/* Core blocks */
+.wp-block-query-pagination {
+  border-top: 1px solid var(--ubf-neutral);
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+}
+
+.wp-block-post-template > li {
+  border-top: 1px solid var(--ubf-neutral);
+  padding-block: 2rem;
+}
+
+.wp-block-post-template > li:first-child {
+  border-top: 0;
+}
+
+.wp-block-post-title a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.12em;
+}
+
+/* Core Navigation switches to its drawer at the V2 shell breakpoint. */
+@media (max-width: 1023px) {
+  :root {
+    --ubf-header-height: 64px;
+    --ubf-header-sticky-height: 64px;
+  }
+
+  .ubf-utility {
+    min-height: 32px;
+  }
+
+  .ubf-primary-header > .wp-block-group {
+    min-height: 64px;
+  }
+
+  .ubf-primary-nav .wp-block-navigation__responsive-container:not(.is-menu-open) {
+    display: none;
+  }
+
+  .ubf-primary-nav .wp-block-navigation__responsive-container-open {
+    display: flex;
+  }
+
+  .ubf-primary-nav .wp-block-navigation__responsive-container.is-menu-open {
+    background: var(--ubf-paper);
+    color: var(--ubf-ink);
+    padding: 24px;
+  }
+
+  .ubf-primary-nav .wp-block-navigation__responsive-container-content {
+    align-items: flex-start;
+  }
+
+  .ubf-primary-nav .ubf-mobile-only {
+    display: flex;
+    margin-top: 0.5rem;
+  }
+
+  .ubf-primary-nav .ubf-mobile-only .wp-block-navigation-item__content {
+    background: var(--ubf-navy);
+    color: var(--ubf-white);
+    padding: 0.8rem 1rem;
+    text-decoration: none;
+  }
+
+  .ubf-header-cta {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .ubf-primary-nav .wp-block-navigation__responsive-container-open {
+    display: none;
+  }
+
+  .ubf-primary-nav .wp-block-navigation__responsive-container:not(.is-menu-open) {
+    display: block;
+    position: static;
+    width: auto;
+  }
+}
+
+@media (max-width: 782px) {
+  .admin-bar .ubf-primary-header {
+    top: 46px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
