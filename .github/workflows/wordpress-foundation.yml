@@ -78,4 +78,4 @@ jobs:
         run: |
           set -euo pipefail
           ! grep -RniE 'fonts\.googleapis\.com|fonts\.gstatic\.com' wordpress/wp-content/themes/ubf-v2
-          ! grep -RniE '<script[^>]+src=["'"']https?://' wordpress/wp-content/themes/ubf-v2 wordpress/wp-content/plugins/ubf-core
+          ! grep -RniE '<script[^>]+src=.*https?://' wordpress/wp-content/themes/ubf-v2 wordpress/wp-content/plugins/ubf-core
