@@ -119,6 +119,36 @@
           "lineHeight": "1.08"
         }
       },
+      "h1": {
+        "typography": {
+          "fontSize": "var:preset|font-size|3-xl"
+        }
+      },
+      "h2": {
+        "typography": {
+          "fontSize": "var:preset|font-size|2-xl"
+        }
+      },
+      "h3": {
+        "typography": {
+          "fontSize": "var:preset|font-size|xl"
+        }
+      },
+      "h4": {
+        "typography": {
+          "fontSize": "var:preset|font-size|lg"
+        }
+      },
+      "h5": {
+        "typography": {
+          "fontSize": "var:preset|font-size|md"
+        }
+      },
+      "h6": {
+        "typography": {
+          "fontSize": "var:preset|font-size|sm"
+        }
+      },
       "link": {
         "color": {
           "text": "var:preset|color|blue"
@@ -141,9 +171,11 @@
       },
       "core/quote": {
         "border": {
-          "color": "var:preset|color|stone",
-          "style": "solid",
-          "width": "0 0 0 4px"
+          "left": {
+            "color": "var:preset|color|stone",
+            "style": "solid",
+            "width": "4px"
+          }
         },
         "spacing": {
           "padding": {
